@@ -7,6 +7,7 @@ class UserFaker {
     $this->setFakeUser();
     $this->addRoutes();
     $this->addCaps();
+    $this->addAdminBar();
   }
   /** Pretend to be the fake user only if user has the capability and our cookie exists and valid   */
   private function setFakeUser(): void {
@@ -39,6 +40,7 @@ class UserFaker {
       ]);
     });
   }
+
   /** @return array users as array with id and login keys */
   private function findValidUsers(): array {
     $query = new \WP_User_Query([
@@ -60,12 +62,38 @@ class UserFaker {
   private function fetchFakeId(): int {
     return intval($_COOKIE[$this->cookieFakeId]);
   }
-
+  /** Add plugin capabilities to roles  */
   private function addCaps() : void {
     $role = get_role('administrator');
     $role->add_cap($this->capFakeUser);
   }
 
+  private function addAdminBar() : void {
+    add_action('admin_bar_menu', function (\WP_Admin_Bar $bar) {
+      if ( $this->canFakeUser($this->realId) ) {
+        $bar->add_menu([
+          'id' => 'display_for_user',
+          'title' => 'A',
+          'meta' => [
+            'class' => 'fakeUserTitle'
+          ],
+        ]);
+        $bar->add_menu([
+          'parent' => 'display_for_user',
+          'title' => 'B',
+          'meta' => [
+            'html' => 'HA',
+            'class' => 'fakeUserBody'
+          ]
+        ]);
+      }
+    });
+    add_action( 'admin_enqueue_scripts' , function () {
+      if ( $this->canFakeUser($this->realId) ) {
+        
+      }
+    });
+  }
   /** @var int The user ID of the real user - The one who was login to system */
   private int $realId = 0;
   /** @var int The user ID of the fake user - The one who was selected by the real user to pretend to */
@@ -74,4 +102,5 @@ class UserFaker {
   private string $cookieFakeId = 'wordpress_userFakeId';
   /** @var string The name of the cookie we store the fake user ID */
   private string $capFakeUser  = 'fake_user';
+
 }
