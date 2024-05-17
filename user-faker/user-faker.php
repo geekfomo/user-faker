@@ -12,8 +12,6 @@
 namespace gfoUserFaker;
 const pluginDir = __DIR__;
 require_once pluginDir . '/lib/UserFaker.php';
-
-
 class Plugin {
   /** Register Hooks */
   public function register() : void {
@@ -22,7 +20,6 @@ class Plugin {
   }
   /** @var Plugin The main instance */
   public static Plugin $main;
-
 }
 
 Plugin::$main = new Plugin();
