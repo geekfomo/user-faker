@@ -72,25 +72,26 @@ class UserFaker {
     add_action('admin_bar_menu', function (\WP_Admin_Bar $bar) {
       if ( $this->canFakeUser($this->realId) ) {
         $bar->add_menu([
-          'id' => 'display_for_user',
-          'title' => 'A',
+          'id' => 'fakeUserTitle',
+          'title' => '',
           'meta' => [
             'class' => 'fakeUserTitle'
           ],
         ]);
         $bar->add_menu([
-          'parent' => 'display_for_user',
-          'title' => 'B',
+          'parent' => 'fakeUserTitle',
+          'title' => '',
           'meta' => [
-            'html' => 'HA',
+            'html' => '',
             'class' => 'fakeUserBody'
           ]
         ]);
       }
     });
-    add_action( 'admin_enqueue_scripts' , function () {
+    add_action( 'wp_enqueue_scripts' , function () {
       if ( $this->canFakeUser($this->realId) ) {
-        
+        wp_enqueue_script('user-faker-1',plugins_url('/assets/main.js' ,pluginFile));
+        wp_enqueue_style ('user-faker-2',plugins_url('/assets/main.css',pluginFile));
       }
     });
   }

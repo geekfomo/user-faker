@@ -10,7 +10,8 @@
  * Requires PHP: 7.4
  */
 namespace gfoUserFaker;
-const pluginDir = __DIR__;
+const pluginDir  = __DIR__;
+const pluginFile = __FILE__;
 require_once pluginDir . '/lib/UserFaker.php';
 class Plugin {
   /** Register Hooks */
