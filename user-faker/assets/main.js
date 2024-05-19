@@ -112,25 +112,106 @@
 	return getRequire(modules, [], '');
 })
 ({
-	"kobi": {
-		"Local Sites": {
-			"geekfomo": {
-				"app": {
-					"public": {
-						"wp-content": {
-							"plugins": {
-								"user-faker": {
-									"assets": {
-										"main.js": function (exports, module, require) {
-											
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+	"assets": {
+		"main.js": function (exports, module, require) {
+			var UserFaker = /** @class */ (function () {
+			    function UserFaker() {
+			        var _this = this;
+			        var _a;
+			        this.endpoint = '/wp-json/user-faker/users';
+			        this.idHead = 'fakeUserHead';
+			        this.idBody = 'fakeUserBody';
+			        this.keyFake = 'wordpress_userFakeId';
+			        this.elemHead = (_a = (document.getElementsByClassName(this.idHead)[0])) === null || _a === void 0 ? void 0 : _a.children[0];
+			        this.elemBody = document.getElementsByClassName(this.idBody)[0];
+			        console.log(this.elemHead, this.elemBody);
+			        if (this.elemBody && this.elemHead) {
+			            fetch(this.endpoint).then(function (res) {
+			                res.json().then(function (data) {
+			                    if (data.code !== 0) {
+			                        return;
+			                    }
+			                    var popUser = function (arr, id) {
+			                        for (var kk = 0; kk < arr.length; kk++) {
+			                            if (arr[kk].id === id) {
+			                                var user = arr[kk];
+			                                arr.splice(kk, 1);
+			                                return user;
+			                            }
+			                        }
+			                        return null;
+			                    };
+			                    var realUser = popUser(data.users, data.realId);
+			                    var fakeUser = popUser(data.users, data.fakeId);
+			                    var body = '';
+			                    var head = '';
+			                    body += _this.addUser({ id: 0, login: "Real User" }, _this.isRealUser(data));
+			                    if (realUser !== null) {
+			                        body += _this.addUser(realUser, _this.isRealUser(data));
+			                    }
+			                    if (fakeUser !== null) {
+			                        body += _this.addUser(fakeUser, true);
+			                    }
+			                    for (var _i = 0, _a = data.users; _i < _a.length; _i++) {
+			                        var user = _a[_i];
+			                        body += _this.addUser(user, user.id === data.fakeId || (data.fakeId === 0 && user.id === data.realId));
+			                    }
+			                    _this.elemBody.innerHTML = body;
+			                    if (fakeUser !== null) {
+			                        _this.elemHead.innerHTML = "".concat(fakeUser.login);
+			                    }
+			                    else if (realUser !== null) {
+			                        _this.elemHead.innerHTML = "Real: ".concat(realUser.login);
+			                    }
+			                    var elems = document.getElementsByClassName('uf');
+			                    var _loop_1 = function (kk) {
+			                        elems[kk].addEventListener('click', function () {
+			                            _this.clickUser(elems[kk]);
+			                        }, false);
+			                    };
+			                    for (var kk = 0; kk < elems.length; kk++) {
+			                        _loop_1(kk);
+			                    }
+			                });
+			            });
+			        }
+			    }
+			    UserFaker.prototype.addUser = function (user, active) {
+			        return "<div class='uf ".concat(active ? "active" : "", "' data-id=\"").concat(user.id, "\" data-login=\"").concat(user.login, "\"><span class=\"ufId\">").concat(user.id, "</span><span class=\"ufLogin\">").concat(user.login, "</span></div>");
+			    };
+			    UserFaker.prototype.isRealUser = function (data) {
+			        return data.fakeId === data.realId || data.fakeId === 0;
+			    };
+			    UserFaker.prototype.clickUser = function (elem) {
+			        var _a;
+			        if (!elem.classList.contains('active')) {
+			            elem.classList.add('active');
+			            var id = elem.dataset.id;
+			            var elems = document.getElementsByClassName('uf');
+			            for (var kk = 0; kk < elems.length; kk++) {
+			                var elem1 = elems[kk];
+			                if (elem1.dataset.id !== id) {
+			                    elem1.classList.remove('active');
+			                }
+			            }
+			            this.updateCookie(parseInt((_a = elem.dataset.id) !== null && _a !== void 0 ? _a : ''));
+			            window.location.reload();
+			        }
+			    };
+			    UserFaker.prototype.updateCookie = function (id) {
+			        var keyFake = '$this->keyFake';
+			        if (id !== -1 && id !== null) {
+			            document.cookie = "".concat(this.keyFake, "=").concat(id, "; path=/ ; Secure");
+			        }
+			        else {
+			            document.cookie = "".concat(this.keyFake, "=; path=/ ; Secure ; Expires=Thu, 01 Jan 1970 00:00:01 GMT;");
+			        }
+			    };
+			    return UserFaker;
+			}());
+			window.addEventListener('DOMContentLoaded', function () {
+			    var uf = new UserFaker();
+			});
 		}
 	}
-})("kobi/Local Sites/geekfomo/app/public/wp-content/plugins/user-faker/assets/main");
+})("assets/main");

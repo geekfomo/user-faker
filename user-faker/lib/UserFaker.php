@@ -31,7 +31,9 @@ class UserFaker {
         'callback' => function (\WP_REST_Request $request) {
           return [
             'code'  => 0,
-            'users' => $this->findValidUsers()
+            'users' => $this->findValidUsers(),
+            'realId' => $this->realId,
+            'fakeId' => $this->fakeId
           ];
         },
         'permission_callback' => function () {
@@ -72,28 +74,30 @@ class UserFaker {
     add_action('admin_bar_menu', function (\WP_Admin_Bar $bar) {
       if ( $this->canFakeUser($this->realId) ) {
         $bar->add_menu([
-          'id' => 'fakeUserTitle',
+          'id' => 'fakeUserHead',
           'title' => '',
           'meta' => [
-            'class' => 'fakeUserTitle'
+            'class' => 'fakeUserHead'
           ],
         ]);
         $bar->add_menu([
-          'parent' => 'fakeUserTitle',
-          'title' => '',
+          'parent' => 'fakeUserHead',
+          'title' => 'A',
           'meta' => [
             'html' => '',
             'class' => 'fakeUserBody'
           ]
         ]);
       }
-    });
-    add_action( 'wp_enqueue_scripts' , function () {
-      if ( $this->canFakeUser($this->realId) ) {
-        wp_enqueue_script('user-faker-1',plugins_url('/assets/main.js' ,pluginFile));
-        wp_enqueue_style ('user-faker-2',plugins_url('/assets/main.css',pluginFile));
+    },100);
+    $addAssets = function () {
+      if ($this->canFakeUser($this->realId)) {
+        wp_enqueue_script('user-faker-1', plugins_url('/assets/main.js', pluginFile));
+        wp_enqueue_style ('user-faker-2', plugins_url('/assets/main.css',pluginFile));
       }
-    });
+    };
+    add_action( 'wp_enqueue_scripts'    , $addAssets);
+    add_action( 'admin_enqueue_scripts' , $addAssets);
   }
   /** @var int The user ID of the real user - The one who was login to system */
   private int $realId = 0;
