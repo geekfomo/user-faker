@@ -1,0 +1,6 @@
+/.gitignore               export-ignore
+/.gitattributes           export-ignore
+/README.md                export-ignore
+/user-faker/assets/*.ts   export-ignore
+/user-faker/assets/*.scss export-ignore
+/user-faker/assets/*.json export-ignore

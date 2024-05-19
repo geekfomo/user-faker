@@ -1,6 +1,6 @@
 /*
 !/.gitignore
+!/.gitattributes
 !/README.md
 !/user-faker
-
 *.map
